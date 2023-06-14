@@ -31,9 +31,9 @@
     </header>
     <main>
         <div class="mx-auto max-w-7xl ">
-            <div class="bg-gray-900">
+            <div class="dark:bg-gray-900">
                 <div class="mx-auto max-w-7xl">
-                    <div class="bg-gray-800 rounded-md shadow-lg py-10">
+                    <div class="dark:bg-gray-800 rounded-md shadow-lg py-10">
                         <div class="px-4 sm:px-6 lg:px-8">
                             <div class="px-4 sm:px-6 lg:px-8">
                                 <div class="sm:flex sm:items-center">
@@ -64,7 +64,7 @@
 
                                     <div>
                                         <h4 class="dark:text-white">
-                                            #INV-12984376
+                                            #{{$invoice_code}}
                                         </h4>
                                     </div>
                                     <div>

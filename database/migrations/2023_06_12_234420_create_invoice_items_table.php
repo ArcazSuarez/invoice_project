@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_code');
-            $table->string('name');
+            $table->string('name')->fulltext();
             $table->integer('qty');
             $table->decimal('price', 10,2);
             $table->decimal('subtotal', 10,2);
+            $table->softDeletes($column = 'deleted_at', $precision = 0);
             $table->timestamps();
 
             $table->foreign('invoice_code')->references('code')->on('invoices')->onDelete('cascade');
