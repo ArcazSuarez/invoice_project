@@ -1,4 +1,4 @@
-<div wire:poll class="py-10">
+<div class="py-10">
     <div x-cloak x-data="{ open: false, itemKey: null }" @remove-item.window="open = true; itemKey = $event.detail;">
         <!-- Modal Backdrop -->
         <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
