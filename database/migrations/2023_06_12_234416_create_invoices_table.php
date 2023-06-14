@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->unsignedBigInteger('user_id');
             $table->string('customer_code');
-            $table->timestamp('due_date');
+            $table->timestamp('due_date')->useCurrent();
+            $table->decimal('total')->default(0);
             $table->softDeletes($column = 'deleted_at', $precision = 0);
             $table->timestamps();
 
