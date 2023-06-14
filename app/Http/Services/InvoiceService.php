@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Traits\CodeGenerator;
 use App\Http\Traits\ValidatesInvoice;
+use App\Jobs\ProcessInvoiceUpdateCreate;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -34,30 +35,13 @@ class InvoiceService
         $this->validateInput(['name' => $name,], ['name' => ['required','string']]);
         $this->total = $this->updateTotalInvoiceValue($this->invoice_items);
         $this->checkInvoiceItems();
-        DB::beginTransaction();
-        try {
-            $invoice_code = ($invoice_code) ? $invoice_code : $this->generateCodeWithPrefix('invoices', 'INV-', 'code');
-            $invoice = Invoice::updateOrCreate(['code' => $invoice_code],[
-                'code' => $invoice_code ,
-                'user_id' => Auth::User()->id,
-                'customer_name' => $name,
-                'total' => $this->total,
-            ]);
-            InvoiceItem::where('invoice_code',$invoice->code)->ForceDelete();
-            foreach ($this->invoice_items as $key => $value) {
-                InvoiceItem::create([
-                    'invoice_code' => $invoice['code'],
-                    'name' => $value['name'],
-                    'qty' => $value['quantity'],
-                    'price' => $value['price'],
-                    'subtotal' => $value['subtotal'],
-                ]);
-            }
-            DB::commit();
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            throw $th;
-        }
+        ProcessInvoiceUpdateCreate::dispatch(
+            $name,
+            Auth::User()->id,
+            $invoice_code,
+            $this->invoice_items,
+            $this->total,
+        );
     }
 
     public function addItems($product_name,$quantity,$price,$invoice_items)

@@ -1,5 +1,5 @@
-<div class="py-10">
-    <div x-data="{ open: false, itemKey: null }" @remove-item.window="open = true; itemKey = $event.detail;">
+<div wire:poll class="py-10">
+    <div x-cloak x-data="{ open: false, itemKey: null }" @remove-item.window="open = true; itemKey = $event.detail;">
         <!-- Modal Backdrop -->
         <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
@@ -11,8 +11,8 @@
                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100"
                 x-transition:leave-end="opacity-0 scale-90"
                 class="w-full px-6 py-4 bg-white dark:bg-gray-800 overflow-hidden sm:w-10/12 md:w-1/2 lg:w-1/3">
-                <h2 class="text-xl font-semibold text-gray-700">Confirm Remove</h2>
-                <p class="mt-1 text-gray-600">Are you sure you want to remove this item?</p>
+                <h2 class="text-xl font-semibold text-gray-700">Confirm Invoice</h2>
+                <p class="mt-1 text-gray-600">Are you sure you want to delete this invoice?</p>
 
                 <div class="flex items-center mt-4">
                     <button @click="open = false"
@@ -36,8 +36,22 @@
                         <div class="px-4 sm:px-6 lg:px-8">
                             <div class="sm:flex sm:items-center">
                                 <div class="sm:flex-auto">
-                                    <h1 class="text-base font-semibold leading-6 dark:text-white">Search</h1>
-                                        <input wire:model='searchTerm' type="text" name="" id="">
+                                    <div>
+                                        <div class="relative rounded-md shadow-sm">
+                                            <div
+                                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                                </svg>
+                                            </div>
+                                            <input wire:model.debounce="searchTerm" type="text"
+                                                class="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                placeholder="Search here">
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                                     <a href="{{route('invoice.create')}}" type="button"
@@ -74,35 +88,40 @@
                                             </thead>
                                             <tbody class="divide-y divide-gray-800">
                                                 @foreach ($invoices as $item)
-                                                    <tr wire:key='{{$item->code}}'>
-                                                        <td
-                                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium dark:text-white sm:pl-0">
-                                                            {{$item->code}}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
-                                                            {{$item->customer_name}}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
-                                                            {{$item->items->count()}}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
-                                                            $ {{$item->total}}
-                                                        </td>
-                                                        <td class="text-right whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
-                                                            {{$item->created_at->toDayDateTimeString()}}
-                                                        </td>
-                                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                                            <a href="{{route('invoice.update',['id' => $item->code])}}" class="text-indigo-400 hover:text-indigo-300">
-                                                                Edit
-                                                            </a>
-                                                            <a href="#" class="text-blue-400 hover:text-indigo-300">
-                                                                View
-                                                            </a>
-                                                            <a x-data="{}" @click="$dispatch('remove-item', '{{ $item->code }}')" href="#" class="text-red-400 hover:text-indigo-300">
-                                                                Delete
-                                                            </a>
-                                                        </td>
-                                                    </tr>
+                                                <tr wire:key='{{$item->code}}'>
+                                                    <td
+                                                        class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium dark:text-white sm:pl-0">
+                                                        {{$item->code}}
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
+                                                        {{$item->customer_name}}
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
+                                                        {{$item->items->count()}}
+                                                    </td>
+                                                    <td class="whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
+                                                        $ {{$item->total}}
+                                                    </td>
+                                                    <td
+                                                        class="text-right whitespace-nowrap px-3 py-4 text-sm dark:text-gray-300">
+                                                        {{$item->created_at->toDayDateTimeString()}}
+                                                    </td>
+                                                    <td
+                                                        class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                                        <a href="{{route('invoice.update',['id' => $item->code])}}"
+                                                            class="text-indigo-400 hover:text-indigo-300">
+                                                            Edit
+                                                        </a>
+                                                        <a href="{{route('invoice.show',['id' => $item->code])}}" class="text-blue-400 hover:text-indigo-300">
+                                                            View
+                                                        </a>
+                                                        <a x-data="{}"
+                                                            @click="$dispatch('remove-item', '{{ $item->code }}')"
+                                                            href="#" class="text-red-400 hover:text-indigo-300">
+                                                            Delete
+                                                        </a>
+                                                    </td>
+                                                </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>

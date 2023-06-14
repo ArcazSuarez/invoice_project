@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Invoice;
 
 use App\Http\Services\InvoiceService;
 use App\Models\Invoice;
+use Illuminate\Support\Facades\Route;
 use Livewire\Component;
 
 class Create extends Component
@@ -23,7 +24,7 @@ class Create extends Component
     public function __construct() {
         $this->invoiceService = new InvoiceService();
     }
-    public function mount($id)
+    public function mount($id = null)
     {
         $this->setProperties($id);
     }
@@ -38,6 +39,7 @@ class Create extends Component
         $this->invoiceService->save($this->name,$this->invoice_items,$this->invoice_code);
         $this->reset();
         $this->resetValidation();
+        return redirect()->route('dashboard');
     }
 
     public function addItems()
@@ -59,15 +61,18 @@ class Create extends Component
     }
 
     private function setProperties($id){
-        $invoice = Invoice::where('code',$id)->with('items')->first();
-        if(!$invoice){
-            return redirect()->route('dashboard');
+        $currentRouteName = Route::currentRouteName();
+        if($currentRouteName == 'invoice.update'){
+            $invoice = Invoice::where('code',$id)->with('items')->first();
+            if(!$invoice){
+                return redirect()->route('dashboard');
+            }
+            $this->invoice_code = $invoice->code;
+            $this->name = $invoice->customer_name;
+            foreach ($invoice->items as $key => $value) {
+                $this->invoice_items = $this->invoiceService->addNewProductToInvoiceItems($value->name,$value->qty,$value->price,$this->invoice_items);
+            }
+            $this->total = $this->invoiceService->updateTotalInvoiceValue($this->invoice_items);
         }
-        $this->invoice_code = $invoice->code;
-        $this->name = $invoice->customer_name;
-        foreach ($invoice->items as $key => $value) {
-            $this->invoice_items = $this->invoiceService->addNewProductToInvoiceItems($value->name,$value->qty,$value->price,$this->invoice_items);
-        }
-        $this->total = $this->invoiceService->updateTotalInvoiceValue($this->invoice_items);
     }
 }
