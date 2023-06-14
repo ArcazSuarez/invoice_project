@@ -23,14 +23,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        \App\Models\Customer::factory()->create([
-            'name' => 'Walk-in Customer',
-            'email' => 'walkin@example.com',
-        ]);
         $daysAgo = 0;
 
         Invoice::factory()
-            ->count(100)
+            ->count(50)
             ->create()
             ->each(function ($invoice) use (&$daysAgo) {
                 $items = InvoiceItem::factory()
