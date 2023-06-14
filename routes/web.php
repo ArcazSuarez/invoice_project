@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Livewire\Invoice\Create as InvoiceCreate;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Invoices\Index as InvoiceIndex;
 
@@ -25,6 +26,7 @@ Route::get('/', function () {
 Route::get('dashboard', InvoiceIndex::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/invoice/create', InvoiceCreate::class)->name('invoice.create');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
