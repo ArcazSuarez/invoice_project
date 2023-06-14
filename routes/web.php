@@ -20,10 +20,6 @@ use App\Http\Livewire\Invoice\Show as InvoiceShow;
 Route::get('/', function () {
     return view('welcome');
 });
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('dashboard', InvoiceIndex::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
